@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: db_admin
+      POSTGRES_PASSWORD: R7PXqqH2
+    ports:
+      - "5430:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  spring-boot-app:
+    image: tomcat:latest
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    volumes:
+      - ./target/auth-starter.war:/usr/local/tomcat/webapps/auth-starter.war
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/auth_db
+      SPRING_DATASOURCE_USERNAME: db_admin
+      SPRING_DATASOURCE_PASSWORD: R7PXqqH2
+      SPRING_APPLICATION_NAME: webgen-auth-service
+      SERVER_PORT: 8080
+      EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE: http://192.168.1.6:9091/eureka
+      EUREKA_CLIENT_ENABLED: false
+
+volumes:
+  postgres_data:
